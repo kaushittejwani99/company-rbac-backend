@@ -31,6 +31,10 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "ok", service: "company-rbac-api" });
 });
 
+app.get("/api/welcome", (req, res) => {
+  res.send("hello welcome to the jungle");
+});
+
 app.use("/api/auth", authRoutes);
 app.use("/api/company", companyRoutes);
 app.use("/api/dashboard", dashboardRoutes);
