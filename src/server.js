@@ -9,9 +9,10 @@ const PORT = process.env.PORT || 5000;
 const startServer = async () => {
   try {
     await connectDB();
-    app.listen(PORT, () => {
-      console.log(`API running on http://localhost:${PORT}`);
-    });
+  // Change this line in your server.js
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`API running on port ${PORT}`);
+});
   } catch (error) {
     console.error("Failed to start API:", error.message);
     process.exit(1);
