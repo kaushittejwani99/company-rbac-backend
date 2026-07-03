@@ -15,9 +15,16 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "https://venture-register-platform.netlify.app"
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || ["http://localhost:5173", "http://localhost:5174"],
+    origin: allowedOrigins,
     credentials: true
   })
 );
