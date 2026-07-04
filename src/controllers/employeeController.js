@@ -1,5 +1,6 @@
 import Employee from "../models/Employee.js";
 import { companyFilter, companyOwnedPayload } from "../utils/companyScope.js";
+import { deleteObjectByUrl } from "../utils/s3.js";
 
 const allowedFields = ["name", "email", "phone", "department", "position", "salary", "status", "joinedAt", "image"];
 
@@ -42,12 +43,18 @@ export const createEmployee = async (req, res, next) => {
 export const updateEmployee = async (req, res, next) => {
   try {
     const payload = pickFields(req.body);
-    
-    // Add image URL if file is uploaded
+
+    const existing = await Employee.findOne(companyFilter(req, { _id: req.params.id }));
+    if (!existing) return res.status(404).json({ message: "Employee not found" });
+
+    // Add image URL if file is uploaded and remove previous image
     if (req.file) {
       payload.image = req.file.location;
+      if (existing.image) {
+        await deleteObjectByUrl(existing.image);
+      }
     }
-    
+
     const employee = await Employee.findOneAndUpdate(
       companyFilter(req, { _id: req.params.id }),
       payload,
@@ -70,6 +77,10 @@ export const deleteEmployee = async (req, res, next) => {
 
     if (!employee) {
       return res.status(404).json({ message: "Employee not found" });
+    }
+
+    if (employee.image) {
+      await deleteObjectByUrl(employee.image);
     }
 
     res.json({ message: "Employee deleted" });

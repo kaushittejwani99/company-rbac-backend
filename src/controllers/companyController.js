@@ -2,6 +2,7 @@ import Company from "../models/Company.js";
 import Employee from "../models/Employee.js";
 import Employer from "../models/Employer.js";
 import { getTokenCompanyId } from "../utils/companyScope.js";
+import { deleteObjectByUrl } from "../utils/s3.js";
 
 const sanitizeCompany = (company) => ({
   id: company._id,
@@ -39,6 +40,11 @@ export const updateCompanyProfile = async (req, res, next) => {
 
     // Add logo URL if file is uploaded
     if (req.file) {
+      // delete previous logo if present
+      const existing = await Company.findById(companyId);
+      if (existing && existing.logo) {
+        await deleteObjectByUrl(existing.logo);
+      }
       payload.logo = req.file.location;
     }
 
@@ -72,15 +78,25 @@ export const deleteCompanyAccount = async (req, res, next) => {
   try {
     const companyId = getTokenCompanyId(req);
 
-    const [employerResult, employeeResult, company] = await Promise.all([
-      Employer.deleteMany({ company: companyId }),
-      Employee.deleteMany({ company: companyId }),
-      Company.findByIdAndDelete(companyId)
-    ]);
+    // fetch company and related records so we can delete images from S3
+    const company = await Company.findById(companyId);
+    if (!company) return res.status(404).json({ message: "Company not found" });
 
-    if (!company) {
-      return res.status(404).json({ message: "Company not found" });
-    }
+    const employers = await Employer.find({ company: companyId });
+    const employees = await Employee.find({ company: companyId });
+
+    // delete images: company logo, employer images, employee images (best-effort)
+    if (company.logo) await deleteObjectByUrl(company.logo);
+    await Promise.all(
+      employers.map((e) => (e.image ? deleteObjectByUrl(e.image) : Promise.resolve()))
+    );
+    await Promise.all(
+      employees.map((e) => (e.image ? deleteObjectByUrl(e.image) : Promise.resolve()))
+    );
+
+    const employerResult = await Employer.deleteMany({ company: companyId });
+    const employeeResult = await Employee.deleteMany({ company: companyId });
+    await Company.findByIdAndDelete(companyId);
 
     res.json({
       message: "Company and related records deleted",
