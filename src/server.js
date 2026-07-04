@@ -6,6 +6,12 @@ dotenv.config();
 
 const PORT = process.env.PORT || 5000;
 
+console.log("AWS S3 Client Configured:", {
+  region: process.env.AWS_REGION,
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID ? "Provided" : "Not Provided",
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ? "Provided" : "Not Provided",
+});
+
 const startServer = async () => {
   try {
     await connectDB();

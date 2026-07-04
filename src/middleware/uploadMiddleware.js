@@ -2,6 +2,9 @@ import multer from "multer";
 import multerS3 from "multer-s3";
 import { S3Client } from "@aws-sdk/client-s3";
 import path from "path";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 // 1. Configure the S3 Client using your .env variables
 const s3 = new S3Client({
@@ -10,6 +13,12 @@ const s3 = new S3Client({
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   }
+});
+
+console.log("AWS S3 Client Configured:", {
+  region: process.env.AWS_REGION,
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID ? "Provided" : "Not Provided",
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ? "Provided" : "Not Provided",
 });
 
 // 2. Keep your existing file filter
@@ -26,7 +35,7 @@ const fileFilter = (req, file, cb) => {
 const createS3Storage = (bucketName) => multerS3({
   s3: s3,
   bucket: bucketName,
-  acl: "public-read", // Assumes you enabled ACLs on the bucket
+  // Removed acl: "public-read" to resolve the AccessControlListNotSupported error
   contentType: multerS3.AUTO_CONTENT_TYPE, // Automatically sets the correct MIME type so images display in the browser instead of downloading
   metadata: function (req, file, cb) {
     cb(null, { fieldName: file.fieldname });
