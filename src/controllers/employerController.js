@@ -26,9 +26,9 @@ export const createEmployer = async (req, res, next) => {
   try {
     const payload = pickFields(req.body);
     
-    // Add image if file is uploaded
+    // Add image URL if file is uploaded
     if (req.file) {
-      payload.image = req.file.filename;
+      payload.image = req.file.location;
     }
     
     const employer = await Employer.create(companyOwnedPayload(req, payload));
@@ -43,9 +43,9 @@ export const updateEmployer = async (req, res, next) => {
   try {
     const payload = pickFields(req.body);
     
-    // Add image if file is uploaded
+    // Add image URL if file is uploaded
     if (req.file) {
-      payload.image = req.file.filename;
+      payload.image = req.file.location;
     }
     
     const employer = await Employer.findOneAndUpdate(

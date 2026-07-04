@@ -8,11 +8,11 @@ import { authorizeRoles, requireAuth } from "../middleware/auth.js";
 import { rejectClientCompanyScope } from "../middleware/companyScope.js";
 import { validateBody } from "../middleware/validate.js";
 import { companyUpdateSchema } from "../validators/schemas.js";
-import { upload } from "../middleware/uploadMiddleware.js";
+import { uploadLogo } from "../middleware/uploadMiddleware.js";
 
 const router = Router();
 
 router.use(requireAuth, authorizeRoles("company"), rejectClientCompanyScope);
-router.route("/").get(getCompanyProfile).put(upload.single("logo"), validateBody(companyUpdateSchema), updateCompanyProfile).delete(deleteCompanyAccount);
+router.route("/").get(getCompanyProfile).put(uploadLogo.single("logo"), validateBody(companyUpdateSchema), updateCompanyProfile).delete(deleteCompanyAccount);
 
 export default router;

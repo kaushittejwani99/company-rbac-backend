@@ -33,7 +33,7 @@ export const signupCompany = async (req, res, next) => {
     }
 
     const passwordHash = await bcrypt.hash(password, 12);
-    const logoPath = req.file ? req.file.filename : "";
+    const logoUrl = req.file ? req.file.location : "";
     
     const company = await Company.create({
       companyName,
@@ -42,7 +42,7 @@ export const signupCompany = async (req, res, next) => {
       industry,
       phone,
       address,
-      logo: logoPath
+      logo: logoUrl
     });
 
     res.status(201).json({

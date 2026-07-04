@@ -37,9 +37,9 @@ export const updateCompanyProfile = async (req, res, next) => {
     const companyId = getTokenCompanyId(req);
     const payload = pickCompanyFields(req.body);
 
-    // Add logo if file is uploaded
+    // Add logo URL if file is uploaded
     if (req.file) {
-      payload.logo = req.file.filename;
+      payload.logo = req.file.location;
     }
 
     if (payload.email) {
