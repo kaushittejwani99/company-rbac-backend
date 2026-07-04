@@ -6,7 +6,7 @@ const phoneRule = Joi.string()
   .max(30)
   .pattern(/^[+\d\s().-]*$/)
   .messages({
-    "string.pattern.base": "phone can contain only numbers, spaces, +, -, dots, and brackets"
+    "string.pattern.base": "phone can contain only numbers "
   });
 
 const emailRule = Joi.string().trim().lowercase().email({ tlds: { allow: false } });
